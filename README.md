@@ -49,6 +49,8 @@ The following arguments are supported:
 * `realm` - (Optional) The name of the realm associated with this group (e.g. ARTIFACTORY, CROWD).
 * `realm_attributes` - (Optional) Realm attributes for use by LDAP.
 
+---
+
 ### artifactory\_local_repository
 
 Provides support for setting up local repositories in Artifactory.
@@ -110,6 +112,8 @@ security (e.g., cross-site scripting attacks). Defaults to `false`.
 * `calculate_yum_metadata` - (Optional) Defaults to `false`.
 * `yum_root_depth` - (Optional) Defaults to `0`.
 * `docker_api_version` - (Optional) Docker API compatibility. Must be `V1` or `V2`. Defaults to `V2`.
+
+---
 
 ### artifactory\_remote_repository
 
@@ -208,7 +212,7 @@ cookies to manage client state. Defaults to `false`.
 `STASH`, `ARTIFACTORY`, `CUSTOM`. Defaults to `GITHUB`.
 * `vcs_git_download_url` - (Optional)
 			
-			
+---
 
 ### artifactory\_user
 
@@ -243,6 +247,7 @@ when is_admin is set to `true`. Default `true`.
 * `groups` - (Optional) An array of groups this user belongs to.
 * `realm` - (Computed) The realm the user belongs to.
 
+---
 
 ### artifactory\_virtual_repository
 
