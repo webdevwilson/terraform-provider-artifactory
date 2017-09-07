@@ -382,8 +382,8 @@ func (c clientConfig) UpdateGroup(g *Group) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to update group. Status: %s. Response: ", resp.Status, )
+	if err := c.validateResponse(200, "update group", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -432,11 +432,15 @@ func (c clientConfig) execute(method string, endpoint string, payload interface{
 
 func (c clientConfig) validateResponse(expectedCode int, action string, resp *http.Response) (err error) {
 	if resp.StatusCode != expectedCode {
-		body := ""
-		if b, err := ioutil.ReadAll(resp.Body); err == nil {
-			body = fmt.Sprintf(" Response: %s", string(b))
+		response := ""
+		if resp, err := ioutil.ReadAll(resp.Body); err == nil {
+			response = fmt.Sprintf(" Response: %s", string(resp))
 		}
-		return fmt.Errorf("Failed to %s. Status: %s.%s", action, resp.Status, body)
+		request := ""
+		if req, err := ioutil.ReadAll(resp.Request.Body); err == nil {
+			request = fmt.Sprintf(" Request:%s\n%s", string(resp.Request.Header), string(req))
+		}
+		return fmt.Errorf("Failed to %s. Status: %s.%s%s", action, resp.Status, request, response)
 	}
 	return nil
 }
