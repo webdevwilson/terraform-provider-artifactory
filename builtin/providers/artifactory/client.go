@@ -438,7 +438,11 @@ func (c clientConfig) validateResponse(expectedCode int, action string, resp *ht
 		}
 		request := ""
 		if req, err := ioutil.ReadAll(resp.Request.Body); err == nil {
-			request = fmt.Sprintf(" Request:%s\n%s", string(resp.Request.Header), string(req))
+			headers := map[string][]string{}
+			for name, header := range resp.Request.Header {
+				headers[name] = header
+			}
+			request = fmt.Sprintf(" Request:%s\n%s", headers, string(req))
 		}
 		return fmt.Errorf("Failed to %s. Status: %s.%s%s", action, resp.Status, request, response)
 	}
