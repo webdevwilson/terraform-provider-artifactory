@@ -4,7 +4,12 @@ Manage [Artifactory](http://jfrog.io) with Terraform
 
 ## Installation via Homebrew
 
-https://github.com/drewsonne/homebrew-tap/blob/master/terraform-provider-artifactory.rb
+```bash
+brew tap drewsonne/tap
+brew install terraform-provider-artifactory
+tf-install-provider artifactory
+```
+See details at https://github.com/drewsonne/homebrew-tap/blob/master/terraform-provider-artifactory.rb
 
 ## Provider
 
