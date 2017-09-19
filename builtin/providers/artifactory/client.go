@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -174,8 +175,8 @@ func (c clientConfig) GetRepository(key string, v interface{}) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to update repository. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "update repository", resp); err != nil {
+		return err
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -196,8 +197,8 @@ func (c clientConfig) CreateRepository(key string, v interface{}) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to create repository. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "create repository", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -212,8 +213,8 @@ func (c clientConfig) UpdateRepository(key string, v interface{}) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to update repository. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "update repository", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -228,8 +229,8 @@ func (c clientConfig) DeleteRepository(key string) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to delete repository. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "delete repository", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -271,8 +272,8 @@ func (c clientConfig) CreateUser(u *User) error {
 		return err
 	}
 
-	if resp.StatusCode != 201 {
-		return fmt.Errorf("Failed to create user. Status: %s", resp.Status)
+	if err := c.validateResponse(201, "create user", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -287,8 +288,8 @@ func (c clientConfig) UpdateUser(u *User) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to update user. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "update user", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -303,8 +304,8 @@ func (c clientConfig) DeleteUser(name string) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to delete user. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "delete user", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -365,8 +366,8 @@ func (c clientConfig) CreateGroup(g *Group) error {
 		return err
 	}
 
-	if resp.StatusCode != 201 {
-		return fmt.Errorf("Failed to create group. Status: %s", resp.Status)
+	if err := c.validateResponse(201, "create group", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -381,8 +382,8 @@ func (c clientConfig) UpdateGroup(g *Group) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to update group. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "update group", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -397,8 +398,8 @@ func (c clientConfig) DeleteGroup(name string) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to delete group. Status: %s", resp.Status)
+	if err := c.validateResponse(200, "delete group", resp); err != nil {
+		return err
 	}
 
 	return resp.Body.Close()
@@ -427,4 +428,23 @@ func (c clientConfig) execute(method string, endpoint string, payload interface{
 	req.Header.Add("content-type", "application/json")
 
 	return client.Do(req)
+}
+
+func (c clientConfig) validateResponse(expectedCode int, action string, resp *http.Response) (err error) {
+	if resp.StatusCode != expectedCode {
+		response := ""
+		if resp, err := ioutil.ReadAll(resp.Body); err == nil {
+			response = fmt.Sprintf(" Response: %s", string(resp))
+		}
+		request := ""
+		if req, err := ioutil.ReadAll(resp.Request.Body); err == nil {
+			headers := map[string][]string{}
+			for name, header := range resp.Request.Header {
+				headers[name] = header
+			}
+			request = fmt.Sprintf(" Request:%s\n%s", headers, string(req))
+		}
+		return fmt.Errorf("Failed to %s. Status: %s.%s%s", action, resp.Status, request, response)
+	}
+	return nil
 }
