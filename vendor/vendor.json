@@ -189,6 +189,12 @@
 			"revisionTime": "2017-07-27T06:48:18Z"
 		},
 		{
+			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "a476722483882dd40b8111f0eb64e1d7f43f56e4",
+			"revisionTime": "2017-08-29T19:49:58Z"
+		},
+		{
 			"checksumSHA1": "87LEfpY9cOk9CP7pWyIbmQ/6enU=",
 			"path": "github.com/go-ini/ini",
 			"revision": "c787282c39ac1fc618827141a1f762240def08a3",
@@ -357,6 +363,12 @@
 			"revisionTime": "2017-02-13T18:49:38Z"
 		},
 		{
+			"checksumSHA1": "vt+P9D2yWDO3gdvdgCzwqunlhxU=",
+			"path": "github.com/hashicorp/logutils",
+			"revision": "0dc08b1671f34c4250ce212759ebd880f743d883",
+			"revisionTime": "2015-06-09T07:04:31Z"
+		},
+		{
 			"checksumSHA1": "knu+KAcZkAVDfMw+sTimHiQYs8A=",
 			"path": "github.com/hashicorp/terraform/config",
 			"revision": "b86967099f52c70e2fc713ba030998006a250cb2",
@@ -381,6 +393,12 @@
 			"revisionTime": "2017-09-25T17:06:04Z"
 		},
 		{
+			"checksumSHA1": "uT6Q9RdSRAkDjyUgQlJ2XKJRab4=",
+			"path": "github.com/hashicorp/terraform/helper/config",
+			"revision": "a716fe2d9068f1faa4ceecf747e4e4dffdfb7323",
+			"revisionTime": "2017-09-25T21:20:50Z"
+		},
+		{
 			"checksumSHA1": "Vbo55GDzPgG/L/+W2pcvDhxrPZc=",
 			"path": "github.com/hashicorp/terraform/helper/experiment",
 			"revision": "b86967099f52c70e2fc713ba030998006a250cb2",
@@ -397,6 +415,20 @@
 			"path": "github.com/hashicorp/terraform/helper/hilmapstructure",
 			"revision": "b86967099f52c70e2fc713ba030998006a250cb2",
 			"revisionTime": "2017-09-25T17:06:04Z"
+		},
+		{
+			"checksumSHA1": "2wJa9F3BGlbe2DNqH5lb5POayRI=",
+			"path": "github.com/hashicorp/terraform/helper/logging",
+			"revision": "a716fe2d9068f1faa4ceecf747e4e4dffdfb7323",
+			"revisionTime": "2017-09-25T21:20:50Z"
+		},
+		{
+			"checksumSHA1": "CwIwANN1kyCaXfotQ3YU0NxQ+xE=",
+			"path": "github.com/hashicorp/terraform/helper/resource",
+			"revision": "8712b03839d1f63c0bfe11cf5f08e94014aeb85c",
+			"revisionTime": "2017-09-19T13:56:27Z",
+			"version": "v0.10.6",
+			"versionExact": "v0.10.6"
 		},
 		{
 			"checksumSHA1": "pCGhHS9BP0onot7vLaHIRDs31Bc=",
