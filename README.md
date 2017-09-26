@@ -2,6 +2,8 @@
 
 Manage [Artifactory](http://jfrog.io) with Terraform
 
+[![CircleCI](https://circleci.com/gh/webdevwilson/terraform-provider-artifactory.svg?style=svg)](https://circleci.com/gh/webdevwilson/terraform-provider-artifactory)
+
 ## Installation via Homebrew
 
 ```bash
