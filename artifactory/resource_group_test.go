@@ -10,7 +10,7 @@ import (
 
 const testAccGroup_basic = `
 resource "artifactory_group" "foobar" {
-	name  = "developers"
+	name  = "acctest-basic"
 }`
 
 func TestAccGroup_basic(t *testing.T) {
@@ -22,7 +22,7 @@ func TestAccGroup_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccGroup_basic,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("artifactory_group.foobar", "name", "developers"),
+					resource.TestCheckResourceAttr("artifactory_group.foobar", "name", "acctest-basic"),
 				),
 			},
 		},
@@ -31,7 +31,7 @@ func TestAccGroup_basic(t *testing.T) {
 
 const testAccGroup_full = `
 resource "artifactory_group" "foobar" {
-	name             = "developers"
+	name             = "acctest-full"
     auto_join        = true
 }`
 
@@ -44,27 +44,9 @@ func TestAccGroup_full(t *testing.T) {
 			resource.TestStep{
 				Config: testAccGroup_full,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("artifactory_group.foobar", "name", "developers"),
+					resource.TestCheckResourceAttr("artifactory_group.foobar", "name", "acctest-full"),
 					resource.TestCheckResourceAttr("artifactory_group.foobar", "auto_join", "true"),
 				),
-			},
-		},
-	})
-}
-
-func TestAccGroup_import(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		CheckDestroy: testAccCheckGroupDestroy("artifactory_group.foobar"),
-		Providers:    testAccProviders,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccGroup_full,
-			},
-			resource.TestStep{
-				ResourceName:      "artifactory_group.foobar",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})

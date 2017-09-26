@@ -8,7 +8,7 @@ import (
 
 const testAccLocalRepository_basic = `
 resource "artifactory_local_repository" "foobar" {
-	key 	     = "foobar-test"
+	key 	     = "acctest-local-basic"
 	package_type = "docker"
 }`
 
@@ -21,7 +21,7 @@ func TestAccLocalRepository_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccLocalRepository_basic,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "key", "foobar-test"),
+					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "key", "acctest-local-basic"),
 					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "package_type", "docker"),
 				),
 			},
@@ -31,7 +31,7 @@ func TestAccLocalRepository_basic(t *testing.T) {
 
 const testAccLocalRepository_full = `
 resource "artifactory_local_repository" "foobar" {
-    key                             = "foobar-test"
+    key                             = "acctest-local-full"
     package_type                    = "npm"
 	description                     = "desc"
 	notes                           = "the notes"
@@ -63,7 +63,7 @@ func TestAccLocalRepository_full(t *testing.T) {
 			resource.TestStep{
 				Config: testAccLocalRepository_full,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "key", "foobar-test"),
+					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "key", "acctest-local-full"),
 					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "package_type", "npm"),
 					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "description", "desc"),
 					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "notes", "the notes"),
@@ -86,24 +86,6 @@ func TestAccLocalRepository_full(t *testing.T) {
 					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "yum_root_depth", "0"),
 					resource.TestCheckResourceAttr("artifactory_local_repository.foobar", "docker_api_version", "V2"),
 				),
-			},
-		},
-	})
-}
-
-func TestAccLocalRepository_import(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckRepositoryDestroy("artifactory_local_repository.foobar"),
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccLocalRepository_basic,
-			},
-			resource.TestStep{
-				ResourceName:      "artifactory_local_repository.foobar",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})

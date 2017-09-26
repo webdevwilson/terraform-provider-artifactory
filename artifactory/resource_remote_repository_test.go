@@ -8,7 +8,7 @@ import (
 
 const testAccRemoteRepository_basic = `
 resource "artifactory_remote_repository" "foobar" {
-	key = "foobar-test"
+	key = "acctest-remote-basic"
     url = "https://central.maven.org"
 }`
 
@@ -21,7 +21,7 @@ func TestAccRemoteRepository_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccRemoteRepository_basic,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "key", "foobar-test"),
+					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "key", "acctest-remote-basic"),
 					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "url", "https://central.maven.org"),
 				),
 			},
@@ -31,7 +31,7 @@ func TestAccRemoteRepository_basic(t *testing.T) {
 
 const testAccRemoteRepository_full = `
 resource "artifactory_remote_repository" "foobar" {
-	key                                   = "foobar-test"
+	key                                   = "acctest-remote-full"
 	package_type                          = "npm"
 	url                                   = "https://registry.npmjs.org/"
 	username                              = "user"
@@ -80,7 +80,7 @@ func TestAccRemoteRepository_full(t *testing.T) {
 			resource.TestStep{
 				Config: testAccRemoteRepository_full,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "key", "foobar-test"),
+					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "key", "acctest-remote-full"),
 					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "package_type", "npm"),
 					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "url", "https://registry.npmjs.org/"),
 					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "username", "user"),
@@ -120,24 +120,6 @@ func TestAccRemoteRepository_full(t *testing.T) {
 					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "vcs_git_provider", ""),
 					resource.TestCheckResourceAttr("artifactory_remote_repository.foobar", "vcs_git_download_url", ""),
 				),
-			},
-		},
-	})
-}
-
-func TestAccRemoteRepository_import(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckRepositoryDestroy("artifactory_remote_repository.foobar"),
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccRemoteRepository_basic,
-			},
-			resource.TestStep{
-				ResourceName:      "artifactory_remote_repository.foobar",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})

@@ -39,7 +39,7 @@ resource "artifactory_user" "foobar" {
     email       = "walter.sobchak@domain.com"
     is_admin    = true
     is_editable = true
-    groups      = [ "readers", "developers" ]
+    groups      = [ "readers" ]
 }`
 
 func TestAccUser_full(t *testing.T) {
@@ -55,26 +55,8 @@ func TestAccUser_full(t *testing.T) {
 					resource.TestCheckResourceAttr("artifactory_user.foobar", "email", "walter.sobchak@domain.com"),
 					resource.TestCheckResourceAttr("artifactory_user.foobar", "is_admin", "true"),
 					resource.TestCheckResourceAttr("artifactory_user.foobar", "is_editable", "true"),
-					resource.TestCheckResourceAttr("artifactory_user.foobar", "groups.#", "2"),
+					resource.TestCheckResourceAttr("artifactory_user.foobar", "groups.#", "1"),
 				),
-			},
-		},
-	})
-}
-
-func TestAccUser_import(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		CheckDestroy: testAccCheckUserDestroy("artifactory_user.foobar"),
-		Providers:    testAccProviders,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccUser_full,
-			},
-			resource.TestStep{
-				ResourceName:      "artifactory_user.foobar",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
