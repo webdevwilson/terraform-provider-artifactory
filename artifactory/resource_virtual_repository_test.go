@@ -28,13 +28,19 @@ func TestAccVirtualRepository_basic(t *testing.T) {
 }
 
 const testAccVirtualRepository_full = `
-resource "artifactory_remote_repository" "npm" {
-	key = "registry.npmjs.org"
-    url = "https://registry.npmjs.org"
+resource "artifactory_remote_repository" "npm-public" {
+  key               = "registry.npmjs.org"
+  package_type      = "npm"
+  description       = "Proxy public npm registry"
+  repo_layout_ref   = "npm-default"
+  url               = "https://registry.npmjs.org/"
+  property_sets = [
+    "artifactory"
+  ]
 }
 
 resource "artifactory_local_repository" "npm-local" {
-	key 	     = "acctest-npm-local"
+	key 	     = "acctest-virtual-npm-local"
 	package_type = "npm"
 }
 
@@ -50,11 +56,11 @@ resource "artifactory_virtual_repository" "foobar" {
     artifactory_requests_can_retrieve_remote_artifacts = false
 	key_pair                                           = "keypair"
     pom_repository_references_cleanup_policy           = "discard_any_reference"
-    default_deployment_repo                            = "acctest-npm-local"
+    default_deployment_repo                            = "acctest-virtual-npm-local"
 	debian_trivial_layout                              = false
     repositories                                       = ["registry.npmjs.org"]
 	depends_on										   = [
-		"artifactory_remote_repository.npm",
+		"artifactory_remote_repository.npm-public",
 		"artifactory_local_repository.npm-local"
 	]
 }`

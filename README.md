@@ -2,8 +2,6 @@
 
 Manage [Artifactory](http://jfrog.io) with Terraform
 
-[![CircleCI](https://circleci.com/gh/webdevwilson/terraform-provider-artifactory.svg?style=svg)](https://circleci.com/gh/webdevwilson/terraform-provider-artifactory)
-
 ## Installation via Homebrew
 
 ```bash
@@ -145,9 +143,9 @@ remote repository.
 # Manage your repository
 resource "artifactory_remote_repository" "publicnpm" {
   key               = "registry.npmjs.org"
-  packageType       = "npm"
+  package_type      = "npm"
   description       = "Proxy public npm registry"
-  repoLayoutRef     = "npm-default"
+  repo_layout_ref   = "npm-default"
   url               = "https://registry.npmjs.org/"
   property_sets = [
     "artifactory"
