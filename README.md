@@ -43,7 +43,7 @@ Provides support for creating groups in Artifactory.
 #### Example Usage
 
 ```hcl
-resource "artifact_group" "developers" {
+resource "artifactory_group" "developers" {
     name      = "developers"
     auto_join = true
 }
@@ -76,7 +76,7 @@ resource "artifactory_local_repository" "localnpm" {
 }
 
 # A Docker repository
-resource "artifact_local_repository" "docker" {
+resource "artifactory_local_repository" "docker" {
     key                   = "docker-local"
     package_type          = "docker"
     repository_layout_ref = "simple-default"
@@ -236,7 +236,7 @@ then immediately expired. This should trigger an email to the user if Artifactor
 #### Example Usage
 
 ```hcl
-resource "artifact_user" "walter" {
+resource "artifactory_user" "walter" {
     name     = "walter.sobchak"
     email    = "walter.sobchak@sobchaksecurity.com"
     is_admin = true
@@ -310,4 +310,5 @@ repository's remote repositories, or by only accessing its caches (default). Def
 * `key_pair` - (Optional)
 * `pom_repository_references_cleanup_policy` - (Optional) Should be one of `discard_active_reference`, 
 `discard_any_reference`, `nothing`.
+
 
