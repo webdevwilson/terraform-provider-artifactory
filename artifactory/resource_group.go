@@ -1,6 +1,8 @@
 package artifactory
 
-import "github.com/hashicorp/terraform/helper/schema"
+import (
+	"github.com/hashicorp/terraform/helper/schema"
+)
 
 func resourceGroup() *schema.Resource {
 	return &schema.Resource{

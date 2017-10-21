@@ -55,6 +55,7 @@ type LocalRepositoryConfiguration struct {
 	CalculateYumMetadata         bool     `json:"calculateYumMetadata,omitempty"`
 	YumRootDepth                 int      `json:"yumRootDepth,omitempty"`
 	DockerAPIVersion             string   `json:"dockerApiVersion,omitempty"`
+	EnableFileListsIndexing      bool     `json:"enableFileListsIndexing,omitempty"`
 }
 
 // RemoteRepositoryConfiguration for configuring a remote repository
@@ -408,6 +409,7 @@ func (c clientConfig) DeleteGroup(name string) error {
 func (c clientConfig) execute(method string, endpoint string, payload interface{}) (*http.Response, error) {
 	client := &http.Client{}
 	url := fmt.Sprintf("%s/api/%s", c.url, endpoint)
+	log.Printf("[DEBUG] Sending Request to method/url: %s %s", method, url)
 
 	var jsonpayload *bytes.Buffer
 	if payload == nil {
@@ -416,7 +418,11 @@ func (c clientConfig) execute(method string, endpoint string, payload interface{
 		var jsonbuffer []byte
 		jsonpayload = bytes.NewBuffer(jsonbuffer)
 		enc := json.NewEncoder(jsonpayload)
-		enc.Encode(payload)
+		err := enc.Encode(payload)
+		if err != nil {
+			log.Printf("[ERROR] Error Encoding Payload: %s", err)
+			return nil, err
+		}
 	}
 
 	req, err := http.NewRequest(method, url, jsonpayload)

@@ -2,7 +2,6 @@ package artifactory
 
 import (
 	"log"
-	"os"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -89,7 +88,6 @@ func newVirtualRepositoryFromResource(d *schema.ResourceData) *VirtualRepository
 	for _, r := range d.Get("repositories").(*schema.Set).List() {
 		repos = append(repos, r.(string))
 	}
-	os.Stdout.WriteString("newVirtualRepositoryFromResource")
 
 	return &VirtualRepositoryConfiguration{
 		Key:                                           d.Get("key").(string),

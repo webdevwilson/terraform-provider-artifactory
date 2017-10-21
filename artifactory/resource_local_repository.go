@@ -115,6 +115,11 @@ func resourceLocalRepository() *schema.Resource {
 				Default:      "V2",
 				ValidateFunc: validation.StringInSlice([]string{"V1", "V2"}, true),
 			},
+			"enable_file_lists_indexing": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -149,6 +154,7 @@ func newLocalRepositoryFromResource(d *schema.ResourceData) *LocalRepositoryConf
 		CalculateYumMetadata:         d.Get("calculate_yum_metadata").(bool),
 		YumRootDepth:                 d.Get("yum_root_depth").(int),
 		DockerAPIVersion:             d.Get("docker_api_version").(string),
+		EnableFileListsIndexing:      d.Get("enable_file_lists_indexing").(bool),
 		PropertySets:                 props,
 	}
 }
@@ -200,6 +206,7 @@ func resourceLocalRepositoryRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("calculate_yum_metadata", repo.CalculateYumMetadata)
 	d.Set("yum_root_depth", repo.YumRootDepth)
 	d.Set("docker_api_version", repo.DockerAPIVersion)
+	d.Set("enable_file_lists_indexing", repo.EnableFileListsIndexing)
 
 	props := make([]string, 0, len(repo.PropertySets))
 	for _, p := range repo.PropertySets {
