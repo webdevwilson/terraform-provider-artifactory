@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 const randomPasswordLength = 16
@@ -51,9 +52,9 @@ func resourceUser() *schema.Resource {
 	}
 }
 
-func newUserFromResource(d *schema.ResourceData) *User {
+func newUserFromResource(d *schema.ResourceData) *artifactory.User {
 	// Artifactory defaults to admin, let's not do that
-	user := &User{}
+	user := &artifactory.User{}
 
 	if v, ok := d.GetOk("name"); ok {
 		user.Name = v.(string)
@@ -96,7 +97,7 @@ func newUserFromResource(d *schema.ResourceData) *User {
 }
 
 func resourceUserRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 
 	user, err := c.GetUser(d.Get("name").(string))
 
@@ -115,7 +116,7 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 	user := newUserFromResource(d)
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	err := c.CreateUser(user)
 
 	if err != nil {
@@ -127,7 +128,7 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	user := newUserFromResource(d)
 	err := c.UpdateUser(user)
 
@@ -145,7 +146,7 @@ func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceUserDelete(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	user := newUserFromResource(d)
 	return c.DeleteUser(user.Name)
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 const testAccGroup_basic = `
@@ -54,7 +55,7 @@ func TestAccGroup_full(t *testing.T) {
 
 func testAccCheckGroupDestroy(id string) func(*terraform.State) error {
 	return func(s *terraform.State) error {
-		client := testAccProvider.Meta().(Client)
+		client := testAccProvider.Meta().(artifactory.Client)
 		rs, ok := s.RootModule().Resources[id]
 		if !ok {
 			return fmt.Errorf("Not found %s", id)

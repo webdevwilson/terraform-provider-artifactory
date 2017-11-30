@@ -601,6 +601,18 @@
 			"revisionTime": "2017-06-05T21:53:11Z"
 		},
 		{
+			"checksumSHA1": "hzcdun4LgNZW2u6xeDLjEqFt/3o=",
+			"path": "github.com/webdevwilson/go-artifactory/artifactory",
+			"revision": "17c687ec2538a354b1c33b79e64f46e76f58ce33",
+			"revisionTime": "2017-11-29T16:28:31Z"
+		},
+		{
+			"checksumSHA1": "9oNURkPA1L7TeZfMuc5RjRMAP94=",
+			"path": "github.com/webdevwilson/terraform-provider-artifactory/artifactory",
+			"revision": "1f53059d96caa585dfea6b5e145a815cbb2d52a2",
+			"revisionTime": "2017-11-30T03:00:44Z"
+		},
+		{
 			"checksumSHA1": "UWjVYmoHlIfHzVIskELHiJQtMOI=",
 			"path": "golang.org/x/crypto/bcrypt",
 			"revision": "847319b7fc94cab682988f93da778204da164588",

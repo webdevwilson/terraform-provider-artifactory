@@ -2,6 +2,7 @@ package artifactory
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 func resourceGroup() *schema.Resource {
@@ -36,9 +37,9 @@ func resourceGroup() *schema.Resource {
 	}
 }
 
-func newGroupFromResource(d *schema.ResourceData) *Group {
+func newGroupFromResource(d *schema.ResourceData) *artifactory.Group {
 	// Artifactory defaults to admin, let's not do that
-	group := &Group{}
+	group := &artifactory.Group{}
 
 	if v, ok := d.GetOk("name"); ok {
 		group.Name = v.(string)
@@ -60,7 +61,7 @@ func newGroupFromResource(d *schema.ResourceData) *Group {
 }
 
 func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 
 	user, err := c.GetGroup(d.Get("name").(string))
 
@@ -78,7 +79,7 @@ func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceGroupCreate(d *schema.ResourceData, m interface{}) error {
 	group := newGroupFromResource(d)
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	err := c.CreateGroup(group)
 
 	if err != nil {
@@ -90,7 +91,7 @@ func resourceGroupCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceGroupUpdate(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	group := newGroupFromResource(d)
 	err := c.UpdateGroup(group)
 
@@ -102,7 +103,7 @@ func resourceGroupUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceGroupDelete(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	group := newGroupFromResource(d)
 	return c.DeleteGroup(group.Name)
 }

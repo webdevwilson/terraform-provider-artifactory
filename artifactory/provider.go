@@ -8,6 +8,8 @@ import (
 	"github.com/hashicorp/terraform/helper/logging"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 func init() {
@@ -57,7 +59,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	url := d.Get("url").(string)
 	hc := &http.Client{Transport: http.DefaultTransport}
 	hc.Transport = logging.NewTransport("Artifactory", hc.Transport)
-	c := NewClient(user, pass, url, hc)
+	c := artifactory.NewClient(user, pass, url, hc)
 
 	// fail early. validate the connection to Artifactory
 	if err := c.Ping(); err != nil {

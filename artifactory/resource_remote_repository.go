@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 func resourceRemoteRepository() *schema.Resource {
@@ -193,13 +194,13 @@ func resourceRemoteRepository() *schema.Resource {
 	}
 }
 
-func newRemoteRepositoryFromResource(d *schema.ResourceData) *RemoteRepositoryConfiguration {
+func newRemoteRepositoryFromResource(d *schema.ResourceData) *artifactory.RemoteRepositoryConfiguration {
 	props := make([]string, 0, len(d.Get("property_sets").(*schema.Set).List()))
 
 	for _, p := range d.Get("property_sets").(*schema.Set).List() {
 		props = append(props, p.(string))
 	}
-	return &RemoteRepositoryConfiguration{
+	return &artifactory.RemoteRepositoryConfiguration{
 		Key:                               d.Get("key").(string),
 		RClass:                            "remote",
 		PackageType:                       d.Get("package_type").(string),
@@ -243,7 +244,7 @@ func newRemoteRepositoryFromResource(d *schema.ResourceData) *RemoteRepositoryCo
 }
 
 func resourceRemoteRepositoryCreate(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	repo := newRemoteRepositoryFromResource(d)
 
 	err := c.CreateRepository(repo.Key, repo)
@@ -257,9 +258,9 @@ func resourceRemoteRepositoryCreate(d *schema.ResourceData, m interface{}) error
 }
 
 func resourceRemoteRepositoryRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	key := d.Id()
-	var repo RemoteRepositoryConfiguration
+	var repo artifactory.RemoteRepositoryConfiguration
 
 	err := c.GetRepository(key, &repo)
 
@@ -315,7 +316,7 @@ func resourceRemoteRepositoryRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceRemoteRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	repo := newRemoteRepositoryFromResource(d)
 	err := c.UpdateRepository(repo.Key, repo)
 	if err != nil {
@@ -325,7 +326,7 @@ func resourceRemoteRepositoryUpdate(d *schema.ResourceData, m interface{}) error
 }
 
 func resourceRemoteRepositoryDelete(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	key := d.Get("key").(string)
 	return c.DeleteRepository(key)
 }

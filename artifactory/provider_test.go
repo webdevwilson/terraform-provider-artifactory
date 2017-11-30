@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
@@ -43,7 +44,7 @@ func testAccPreCheck(t *testing.T) {
 
 func testAccCheckRepositoryDestroy(id string) func(*terraform.State) error {
 	return func(s *terraform.State) error {
-		client := testAccProvider.Meta().(Client)
+		client := testAccProvider.Meta().(artifactory.Client)
 		rs, ok := s.RootModule().Resources[id]
 		if !ok {
 			return fmt.Errorf("Not found %s", id)

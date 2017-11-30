@@ -3,6 +3,7 @@ package artifactory
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/webdevwilson/go-artifactory/artifactory"
 )
 
 func resourceLocalRepository() *schema.Resource {
@@ -125,7 +126,7 @@ func resourceLocalRepository() *schema.Resource {
 	}
 }
 
-func newLocalRepositoryFromResource(d *schema.ResourceData) *LocalRepositoryConfiguration {
+func newLocalRepositoryFromResource(d *schema.ResourceData) *artifactory.LocalRepositoryConfiguration {
 
 	props := make([]string, 0, len(d.Get("property_sets").(*schema.Set).List()))
 
@@ -133,7 +134,7 @@ func newLocalRepositoryFromResource(d *schema.ResourceData) *LocalRepositoryConf
 		props = append(props, p.(string))
 	}
 
-	return &LocalRepositoryConfiguration{
+	return &artifactory.LocalRepositoryConfiguration{
 		Key:                          d.Get("key").(string),
 		RClass:                       "local",
 		PackageType:                  d.Get("package_type").(string),
@@ -161,7 +162,7 @@ func newLocalRepositoryFromResource(d *schema.ResourceData) *LocalRepositoryConf
 }
 
 func resourceLocalRepositoryCreate(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	repo := newLocalRepositoryFromResource(d)
 
 	err := c.CreateRepository(repo.Key, repo)
@@ -175,10 +176,10 @@ func resourceLocalRepositoryCreate(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceLocalRepositoryRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	key := d.Id()
 
-	var repo LocalRepositoryConfiguration
+	var repo artifactory.LocalRepositoryConfiguration
 
 	err := c.GetRepository(key, &repo)
 
@@ -219,7 +220,7 @@ func resourceLocalRepositoryRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceLocalRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	repo := newLocalRepositoryFromResource(d)
 	err := c.UpdateRepository(repo.Key, repo)
 	if err != nil {
@@ -229,7 +230,7 @@ func resourceLocalRepositoryUpdate(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceLocalRepositoryDelete(d *schema.ResourceData, m interface{}) error {
-	c := m.(Client)
+	c := m.(artifactory.Client)
 	key := d.Id()
 	return c.DeleteRepository(key)
 }
