@@ -13,6 +13,7 @@ func resourceVirtualRepository() *schema.Resource {
 		Read:   resourceVirtualRepositoryRead,
 		Update: resourceVirtualRepositoryUpdate,
 		Delete: resourceVirtualRepositoryDelete,
+		Exists: resourceRepositoryExists,
 		Importer: &schema.ResourceImporter{
 			State: virtualRepositoryImportStatePassthrough,
 		},
@@ -103,6 +104,17 @@ func newVirtualRepositoryFromResource(d *schema.ResourceData) *VirtualRepository
 		PomRepositoryReferencesCleanupPolicy: d.Get("pom_repository_references_cleanup_policy").(string),
 		DefaultDeploymentRepo:                d.Get("default_deployment_repo").(string),
 	}
+}
+
+func resourceRepositoryExists(d *schema.ResourceData, m interface{}) (exists bool, err error) {
+	c := m.(Client)
+	key := d.Id()
+	var repo VirtualRepositoryConfiguration
+
+	err = c.GetRepository(key, &repo)
+	exists = (repo.Key == key)
+
+	return
 }
 
 func resourceVirtualRepositoryCreate(d *schema.ResourceData, m interface{}) error {

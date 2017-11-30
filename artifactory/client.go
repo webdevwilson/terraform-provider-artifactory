@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 )
 
 // User represents an Artifactory user
@@ -118,9 +119,11 @@ type VirtualRepositoryConfiguration struct {
 }
 
 type clientConfig struct {
-	user string
-	pass string
-	url  string
+	user     string
+	pass     string
+	url      string
+	clientMu sync.Mutex // clientMu protects the client during multi-threaded calls]
+	client   *http.Client
 }
 
 // Client is used to call Artifactory REST APIs
@@ -144,12 +147,23 @@ type Client interface {
 var _ Client = clientConfig{}
 
 // NewClient constructs a new artifactory client
-func NewClient(username string, pass string, url string) Client {
-	return clientConfig{
-		username,
-		pass,
-		strings.TrimRight(url, "/"),
+func NewClient(username, pass, url string, client *http.Client) *clientConfig {
+	return &clientConfig{
+		user:   username,
+		pass:   pass,
+		url:    strings.TrimRight(url, "/"),
+		client: client,
 	}
+}
+
+// Lock the client until release
+func (c *clientConfig) Lock() {
+	c.clientMu.Lock()
+}
+
+// Unlock the client after a lock action
+func (c *clientConfig) Unlock() {
+	c.clientMu.Unlock()
 }
 
 // Ping calls the system to verify connectivity
@@ -176,7 +190,7 @@ func (c clientConfig) GetRepository(key string, v interface{}) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "update repository", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "read repository"); err != nil {
 		return err
 	}
 
@@ -198,7 +212,7 @@ func (c clientConfig) CreateRepository(key string, v interface{}) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "create repository", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "create repository"); err != nil {
 		return err
 	}
 
@@ -214,7 +228,7 @@ func (c clientConfig) UpdateRepository(key string, v interface{}) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "update repository", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "update repository"); err != nil {
 		return err
 	}
 
@@ -230,7 +244,7 @@ func (c clientConfig) DeleteRepository(key string) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "delete repository", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "delete repository"); err != nil {
 		return err
 	}
 
@@ -273,7 +287,7 @@ func (c clientConfig) CreateUser(u *User) error {
 		return err
 	}
 
-	if err := c.validateResponse(201, "create user", resp); err != nil {
+	if err := c.validateResponse(201, resp.StatusCode, "create user"); err != nil {
 		return err
 	}
 
@@ -289,7 +303,7 @@ func (c clientConfig) UpdateUser(u *User) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "update user", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "update user"); err != nil {
 		return err
 	}
 
@@ -305,7 +319,7 @@ func (c clientConfig) DeleteUser(name string) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "delete user", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "delete user"); err != nil {
 		return err
 	}
 
@@ -367,7 +381,7 @@ func (c clientConfig) CreateGroup(g *Group) error {
 		return err
 	}
 
-	if err := c.validateResponse(201, "create group", resp); err != nil {
+	if err := c.validateResponse(201, resp.StatusCode, "create group"); err != nil {
 		return err
 	}
 
@@ -383,7 +397,7 @@ func (c clientConfig) UpdateGroup(g *Group) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "update group", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "update group"); err != nil {
 		return err
 	}
 
@@ -399,17 +413,19 @@ func (c clientConfig) DeleteGroup(name string) error {
 		return err
 	}
 
-	if err := c.validateResponse(200, "delete group", resp); err != nil {
+	if err := c.validateResponse(200, resp.StatusCode, "delete group"); err != nil {
 		return err
 	}
 
 	return resp.Body.Close()
 }
 
-func (c clientConfig) execute(method string, endpoint string, payload interface{}) (*http.Response, error) {
-	client := &http.Client{}
+func (c clientConfig) execute(method string, endpoint string, payload interface{}) (resp *http.Response, err error) {
+	var req *http.Request
+	c.Lock()
+	defer c.Unlock()
+
 	url := fmt.Sprintf("%s/api/%s", c.url, endpoint)
-	log.Printf("[DEBUG] Sending Request to method/url: %s %s", method, url)
 
 	var jsonpayload *bytes.Buffer
 	if payload == nil {
@@ -418,14 +434,14 @@ func (c clientConfig) execute(method string, endpoint string, payload interface{
 		var jsonbuffer []byte
 		jsonpayload = bytes.NewBuffer(jsonbuffer)
 		enc := json.NewEncoder(jsonpayload)
-		err := enc.Encode(payload)
+		err = enc.Encode(payload)
 		if err != nil {
 			log.Printf("[ERROR] Error Encoding Payload: %s", err)
 			return nil, err
 		}
 	}
 
-	req, err := http.NewRequest(method, url, jsonpayload)
+	req, err = http.NewRequest(method, url, jsonpayload)
 	if err != nil {
 		log.Printf("[ERROR] Error creating new request: %s", err)
 		return nil, err
@@ -433,24 +449,17 @@ func (c clientConfig) execute(method string, endpoint string, payload interface{
 	req.SetBasicAuth(c.user, c.pass)
 	req.Header.Add("content-type", "application/json")
 
-	return client.Do(req)
+	resp, err = c.client.Do(req)
+	if err == io.EOF {
+		err = nil // ignore EOF errors caused by empty response body
+	}
+
+	return resp, err
 }
 
-func (c clientConfig) validateResponse(expectedCode int, action string, resp *http.Response) (err error) {
-	if resp.StatusCode != expectedCode {
-		response := ""
-		if resp, err := ioutil.ReadAll(resp.Body); err == nil {
-			response = fmt.Sprintf(" Response: %s", string(resp))
-		}
-		request := ""
-		if req, err := ioutil.ReadAll(resp.Request.Body); err == nil {
-			headers := map[string][]string{}
-			for name, header := range resp.Request.Header {
-				headers[name] = header
-			}
-			request = fmt.Sprintf(" Request:%s\n%s", headers, string(req))
-		}
-		return fmt.Errorf("Failed to %s. Status: %s.%s%s", action, resp.Status, request, response)
+func (c clientConfig) validateResponse(expected int, actual int, action string) (err error) {
+	if expected != actual {
+		err = fmt.Errorf("Expected %d for '%s', got '%d'", expected, action, actual)
 	}
-	return nil
+	return
 }

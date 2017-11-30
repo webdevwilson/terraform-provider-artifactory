@@ -13,6 +13,7 @@ func resourceRemoteRepository() *schema.Resource {
 		Read:   resourceRemoteRepositoryRead,
 		Update: resourceRemoteRepositoryUpdate,
 		Delete: resourceRemoteRepositoryDelete,
+		Exists: resourceRepositoryExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},

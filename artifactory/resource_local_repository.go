@@ -11,6 +11,7 @@ func resourceLocalRepository() *schema.Resource {
 		Read:   resourceLocalRepositoryRead,
 		Update: resourceLocalRepositoryUpdate,
 		Delete: resourceLocalRepositoryDelete,
+		Exists: resourceRepositoryExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},

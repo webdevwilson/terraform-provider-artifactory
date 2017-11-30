@@ -8,7 +8,7 @@ import (
 
 const testAccVirtualRepository_basic = `
 resource "artifactory_virtual_repository" "foobar" {
-	key 	     = "acctest-virtual-basic"
+    key          = "acctest-virtual-basic"
 }`
 
 func TestAccVirtualRepository_basic(t *testing.T) {
@@ -30,7 +30,7 @@ func TestAccVirtualRepository_basic(t *testing.T) {
 
 const testAccVirtualRepository_full = `
 resource "artifactory_remote_repository" "npm_public" {
-  key               = "acctest-virtual-npm-private"
+  key               = "acctest-virtual-npm-public"
   package_type      = "npm"
   description       = "Proxy public npm registry"
   repo_layout_ref   = "npm-default"
@@ -41,29 +41,29 @@ resource "artifactory_remote_repository" "npm_public" {
 }
 
 resource "artifactory_local_repository" "npm_private" {
-	key 	     	= "acctest-virtual-npm-private"
-	package_type 	= "npm"
-	repo_layout_ref = "npm-default"
+    key              = "acctest-virtual-npm-private"
+    package_type     = "npm"
+    repo_layout_ref = "npm-default"
 }
 
 resource "artifactory_virtual_repository" "npm" {
     key                                                = "acctest-virtual-full"
     package_type                                       = "npm"
-	description                                        = "desc"
-	notes                                              = "the notes"
-	includes_pattern                                   = "**/*"
-	excludes_pattern                                   = "**/*.tgz"
+    description                                        = "desc"
+    notes                                              = "the notes"
+    includes_pattern                                   = "**/*"
+    excludes_pattern                                   = "**/*.tgz"
     debian_trivial_layout                              = false
     repo_layout_ref                                    = "npm-default"
     artifactory_requests_can_retrieve_remote_artifacts = false
-	key_pair                                           = "keypair"
+    key_pair                                           = "keypair"
     pom_repository_references_cleanup_policy           = "discard_any_reference"
     default_deployment_repo                            = "${artifactory_local_repository.npm_private.key}"
-	debian_trivial_layout                              = false
+    debian_trivial_layout                              = false
     repositories                                       = [
-		"${artifactory_remote_repository.npm_public.key}",
-		"${artifactory_local_repository.npm_private.key}"
-	]
+        "${artifactory_remote_repository.npm_public.key}",
+        "${artifactory_local_repository.npm_private.key}"
+    ]
 }`
 
 func TestAccVirtualRepository_full(t *testing.T) {
