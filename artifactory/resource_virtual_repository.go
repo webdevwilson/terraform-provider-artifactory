@@ -129,7 +129,7 @@ func resourceVirtualRepositoryCreate(d *schema.ResourceData, m interface{}) erro
 	}
 
 	d.SetId(repo.Key)
-	return resourceVirtualRepositoryRead(d, m)
+	return resourceVirtualRepositoryUpdate(d, m)
 }
 
 func resourceVirtualRepositoryRead(d *schema.ResourceData, m interface{}) error {
@@ -169,7 +169,22 @@ func resourceVirtualRepositoryUpdate(d *schema.ResourceData, m interface{}) erro
 	log.Printf("[TRACE] Updating artifactory.virtual_repository Id=%s\n", d.Id())
 	c := m.(artifactory.Client)
 	repo := newVirtualRepositoryFromResource(d)
-	err := c.UpdateRepository(repo.Key, repo)
+	c.UpdateRepository(repo.Key, repo)
+
+	wait := repoCreateWait()
+	wait.Refresh = func() (interface{}, string, error) {
+		log.Printf("[DEBUG] Checking if Group %s is created", repo.Key)
+
+		newRepo := VirtualRepositoryConfiguration{}
+		err := c.GetRepository(repo.Key, &newRepo)
+		if err != nil {
+			return newRepo, "updating", err
+		}
+		log.Printf("[DEBUG] Group %s is created", repo.Key)
+		return newRepo, "updated", err
+	}
+
+	_, err := wait.WaitForState()
 	if err != nil {
 		return err
 	}

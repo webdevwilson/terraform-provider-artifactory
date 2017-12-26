@@ -2,6 +2,7 @@ package artifactory
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -254,7 +255,7 @@ func resourceRemoteRepositoryCreate(d *schema.ResourceData, m interface{}) error
 	}
 
 	d.SetId(repo.Key)
-	return resourceRemoteRepositoryRead(d, m)
+	return resourceRemoteRepositoryUpdate(d, m)
 }
 
 func resourceRemoteRepositoryRead(d *schema.ResourceData, m interface{}) error {
@@ -318,7 +319,22 @@ func resourceRemoteRepositoryRead(d *schema.ResourceData, m interface{}) error {
 func resourceRemoteRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(artifactory.Client)
 	repo := newRemoteRepositoryFromResource(d)
-	err := c.UpdateRepository(repo.Key, repo)
+	c.UpdateRepository(repo.Key, repo)
+
+	wait := repoCreateWait()
+	wait.Refresh = func() (interface{}, string, error) {
+		log.Printf("[DEBUG] Checking if Group %s is created", repo.Key)
+
+		newRepo := RemoteRepositoryConfiguration{}
+		err := c.GetRepository(repo.Key, &newRepo)
+		if err != nil {
+			return newRepo, "updating", err
+		}
+		log.Printf("[DEBUG] Group %s is created", repo.Key)
+		return newRepo, "updated", err
+	}
+
+	_, err := wait.WaitForState()
 	if err != nil {
 		return err
 	}

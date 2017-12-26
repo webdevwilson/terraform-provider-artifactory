@@ -1,6 +1,10 @@
 package artifactory
 
 import (
+	"log"
+	"time"
+
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/webdevwilson/go-artifactory/artifactory"
@@ -161,18 +165,23 @@ func newLocalRepositoryFromResource(d *schema.ResourceData) *artifactory.LocalRe
 	}
 }
 
+func repoCreateWait() resource.StateChangeConf {
+	return resource.StateChangeConf{
+		Pending:                   []string{"updating"},
+		Target:                    []string{"updated"},
+		Timeout:                   5 * time.Minute,
+		MinTimeout:                2 * time.Second,
+		ContinuousTargetOccurence: 15,
+	}
+}
+
 func resourceLocalRepositoryCreate(d *schema.ResourceData, m interface{}) error {
 	c := m.(artifactory.Client)
 	repo := newLocalRepositoryFromResource(d)
 
-	err := c.CreateRepository(repo.Key, repo)
-
-	if err != nil {
-		return err
-	}
-
+	c.CreateRepository(repo.Key, repo)
 	d.SetId(repo.Key)
-	return resourceLocalRepositoryRead(d, m)
+	return resourceLocalRepositoryUpdate(d, m)
 }
 
 func resourceLocalRepositoryRead(d *schema.ResourceData, m interface{}) error {
@@ -222,10 +231,26 @@ func resourceLocalRepositoryRead(d *schema.ResourceData, m interface{}) error {
 func resourceLocalRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(artifactory.Client)
 	repo := newLocalRepositoryFromResource(d)
-	err := c.UpdateRepository(repo.Key, repo)
+	c.UpdateRepository(repo.Key, repo)
+
+	wait := repoCreateWait()
+	wait.Refresh = func() (interface{}, string, error) {
+		log.Printf("[DEBUG] Checking if Group %s is created", repo.Key)
+
+		newRepo := LocalRepositoryConfiguration{}
+		err := c.GetRepository(repo.Key, &newRepo)
+		if err != nil {
+			return newRepo, "updating", err
+		}
+		log.Printf("[DEBUG] Group %s is created", repo.Key)
+		return newRepo, "updated", err
+	}
+
+	_, err := wait.WaitForState()
 	if err != nil {
 		return err
 	}
+
 	return resourceLocalRepositoryRead(d, m)
 }
 

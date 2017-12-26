@@ -63,16 +63,16 @@ func newGroupFromResource(d *schema.ResourceData) *artifactory.Group {
 func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(artifactory.Client)
 
-	user, err := c.GetGroup(d.Get("name").(string))
+	group, err := c.GetGroup(d.Get("name").(string))
 
 	if err != nil {
 		return err
 	}
 
-	d.Set("name", user.Name)
-	d.Set("auto_join", user.AutoJoin)
-	d.Set("realm", user.Realm)
-	d.Set("realm_attributes", user.RealmAttributes)
+	d.Set("name", group.Name)
+	d.Set("auto_join", group.AutoJoin)
+	d.Set("realm", group.Realm)
+	d.Set("realm_attributes", group.RealmAttributes)
 
 	return nil
 }
