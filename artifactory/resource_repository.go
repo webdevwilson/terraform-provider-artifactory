@@ -13,7 +13,7 @@ var types,
 
 func init() {
 	types = []string{"local", "remote", "virtual"}
-	packageTypes = strings.Split("maven|gradle|ivy|sbt|nuget|gems|npm|bower|debian|composer|pypi|docker|vagrant|gitlfs|yum|conan|generic", "|")
+	packageTypes = strings.Split("maven|gradle|ivy|sbt|nuget|gems|npm|bower|debian|composer|pypi|docker|vagrant|gitlfs|conan|generic|rpm", "|")
 	checksumPolicyTypes = []string{"client-checksums", "server-generated-checksums"}
 	snapshotVersionBehaviors = []string{"unique", "non-unique", "deployer"}
 	remoteRepoChecksumPolicyTypes = []string{"", "generate-if-absent", "fail", "ignore-and-generate", "pass-thru"}

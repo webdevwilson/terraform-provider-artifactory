@@ -1,17 +1,17 @@
-
 resource "artifactory_remote_repository" "npm_public" {
-  key               = "registry.npmjs.org"
-  package_type      = "npm"
-  description       = "Proxy public npm registry"
-  repo_layout_ref   = "npm-default"
-  url               = "https://registry.npmjs.org/"
+  key             = "registry.npmjs.org"
+  package_type    = "npm"
+  description     = "Proxy public npm registry"
+  repo_layout_ref = "npm-default"
+  url             = "https://registry.npmjs.org/"
+
   property_sets = [
-    "artifactory"
+    "artifactory",
   ]
 }
 
 resource "artifactory_local_repository" "npm_private" {
-  key 	          = "npm-local"
+  key             = "npm-local"
   package_type    = "npm"
   description     = "Private npm registry"
   repo_layout_ref = "npm-default"
@@ -31,8 +31,9 @@ resource "artifactory_virtual_repository" "npm" {
   pom_repository_references_cleanup_policy           = "discard_any_reference"
   default_deployment_repo                            = "${artifactory_local_repository.npm_private.key}"
   debian_trivial_layout                              = false
-  repositories                                       = [
+
+  repositories = [
     "${artifactory_remote_repository.npm_public.key}",
-    "${artifactory_local_repository.npm_private.key}"
+    "${artifactory_local_repository.npm_private.key}",
   ]
 }

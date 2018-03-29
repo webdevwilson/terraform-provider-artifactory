@@ -237,7 +237,7 @@ func resourceLocalRepositoryUpdate(d *schema.ResourceData, m interface{}) error 
 	wait.Refresh = func() (interface{}, string, error) {
 		log.Printf("[DEBUG] Checking if Group %s is created", repo.Key)
 
-		newRepo := LocalRepositoryConfiguration{}
+		newRepo := artifactory.LocalRepositoryConfiguration{}
 		err := c.GetRepository(repo.Key, &newRepo)
 		if err != nil {
 			return newRepo, "updating", err

@@ -175,7 +175,7 @@ func resourceVirtualRepositoryUpdate(d *schema.ResourceData, m interface{}) erro
 	wait.Refresh = func() (interface{}, string, error) {
 		log.Printf("[DEBUG] Checking if Group %s is created", repo.Key)
 
-		newRepo := VirtualRepositoryConfiguration{}
+		newRepo := artifactory.VirtualRepositoryConfiguration{}
 		err := c.GetRepository(repo.Key, &newRepo)
 		if err != nil {
 			return newRepo, "updating", err
